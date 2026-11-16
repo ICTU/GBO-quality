@@ -17,7 +17,8 @@ Het kopieert:
 - `.github/CODEOWNERS`;
 - `.pre-commit-config.yaml`;
 - `sonar-project.properties` en `cliff.toml`;
-- `CLAUDE.md` en `.claude/`: skill en hooks voor Claude Code.
+- `AGENTS.md`: instructies voor alle AI-codeerassistenten (Claude Code, Codex, Copilot en andere);
+- `CLAUDE.md` en `.claude/`: importeert AGENTS.md, plus skill en hooks voor Claude Code.
 
 ## 2. Aanpassen aan de component
 
@@ -25,7 +26,8 @@ Het kopieert:
 - `sonar-project.properties`: projectsleutel en bronmappen.
 - `.pre-commit-config.yaml`: zet de linters aan voor de gebruikte taal.
 - `CODEOWNERS`: teams of personen.
-- `CLAUDE.md`: korte beschrijving van de component en hoe je lokaal test.
+- `AGENTS.md`: korte beschrijving van de component en hoe je lokaal test. Zet gedeelde AI-instructies
+  hier, niet in `CLAUDE.md`.
 
 ## 3. Secrets en variabelen instellen
 

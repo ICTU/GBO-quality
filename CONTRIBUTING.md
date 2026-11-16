@@ -20,7 +20,7 @@ gebaseerd op de [Contributor Covenant](https://www.contributor-covenant.org/).
 5. Wijzigingen in de herbruikbare workflows test je eerst in één GBO-repository door naar je branch te
    verwijzen (`@mijn-branch`) voordat je merget.
 
-Lokaal controleren: zie [CLAUDE.md](CLAUDE.md) voor de test-, lint- en pre-commit-commando's.
+Lokaal controleren: zie [AGENTS.md](AGENTS.md) voor de test-, lint- en pre-commit-commando's.
 
 ## Commitberichten
 

@@ -40,7 +40,8 @@ scripts/
   check_dod.py               Controleert of alle DoD-items in de PR afgevinkt of als n.v.t. gemarkeerd zijn
   check_traceability.py      Controleert of een PR naar een story of issue verwijst
   aansluiten.sh              Kopieert de templates naar een GBO-repository
-templates/                   Bestanden die in elke GBO-repository komen
+templates/                   Bestanden die in elke GBO-repository komen (o.a. AGENTS.md en CLAUDE.md)
+AGENTS.md                    Instructies voor AI-codeerassistenten in deze repository
 claude/                      Claude Code-skill en hooks (worden via aansluiten.sh gekopieerd)
 quality-time/                Inrichting van de kwaliteitsrapportage in Quality-time
 bronnen-orig/                Originele bronbestanden (o.a. ICTU Kwaliteitsaanpak v5.4.1 in Word)

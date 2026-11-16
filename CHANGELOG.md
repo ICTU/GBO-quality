@@ -16,3 +16,6 @@ De versienummering volgt [Semantic Versioning](https://semver.org/lang/nl/).
   ADR's, herbruikbare workflows (quality-ci, pr-checks, dynamic-scans, release, self-ci), templates
   voor componentrepositories, controlescripts (DoD, traceerbaarheid), Claude Code-skill en hooks,
   en de inrichting van Quality-time.
+- `AGENTS.md` met de gedeelde instructies voor AI-codeerassistenten, in deze repository en in de
+  templates; `CLAUDE.md` importeert dit bestand. Regels toegevoegd over het gebruik van bronnen-md/ en
+  bronvermelding in docs/.

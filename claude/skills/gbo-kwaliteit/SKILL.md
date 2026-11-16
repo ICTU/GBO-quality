@@ -21,7 +21,7 @@ Normen staan in `references/normen.md`. De review-checklist staat in `references
 
 ## Voor een commit
 
-1. Draai de tests van de component (zie CLAUDE.md) en `pre-commit run`.
+1. Draai de tests van de component (zie AGENTS.md) en `pre-commit run`.
 2. Los gevonden problemen op in plaats van ze te onderdrukken.
 3. Schrijf een Conventional Commit-bericht: `type(scope): omschrijving`. Gebruik `feat`, `fix`,
    `perf`, `security`, `docs`, `refactor`, `test`, `ci`, `chore`. Zet `BREAKING CHANGE:` in de body
