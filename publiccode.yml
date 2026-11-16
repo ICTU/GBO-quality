@@ -37,6 +37,7 @@ maintenance:
   type: "community"
   contacts:
     - name: Govert Claus
+      email: "govert.claus@ictu.nl"
 
 localisation:
   localisationReady: false

@@ -35,5 +35,7 @@ Deze repository valt onder de [European Union Public Licence v1.2 (EUPL-1.2)](LI
 
 ## Contact
 
-Repository-eigenaar: **Govert Claus** — GitHub [@Govert-Claus](https://github.com/Govert-Claus).
-Vragen en voorstellen kun je als [issue](https://github.com/ICTU/GBO-quality/issues) indienen.
+Eigenaar: ICTU - project GBO
+Contactpersoon: [Govert Claus](mailto:govert.claus@ictu.nl)
+
+Vragen en voorstellen kun je ook als [issue](https://github.com/ICTU/GBO-quality/issues) indienen.

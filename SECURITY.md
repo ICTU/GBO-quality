@@ -14,11 +14,12 @@ Alleen de meest recente versie op de `main`-branch wordt onderhouden.
 
 Meld een beveiligingsprobleem **niet** via een openbaar issue. Gebruik in plaats
 daarvan GitHub **Private Vulnerability Reporting** (tabblad *Security* →
-*Report a vulnerability*).
+*Report a vulnerability*) of mail naar govert.claus@ictu.nl.
 
 Beschrijf het probleem, de stappen om het te reproduceren en de mogelijke impact.
 We streven ernaar binnen vijf werkdagen te reageren.
 
 ## Contactpersoon
 
-Repository-eigenaar: **Govert Claus** — GitHub [@Govert-Claus](https://github.com/Govert-Claus)
+Eigenaar: ICTU - project GBO
+Contactpersoon: [Govert Claus](mailto:govert.claus@ictu.nl)
