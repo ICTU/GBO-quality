@@ -1,0 +1,44 @@
+publiccodeYmlVersion: "0.2"
+
+name: GBO-quality
+url: "https://github.com/ICTU/GBO-quality.git"
+releaseDate: "2026-11-16"
+
+platforms:
+  - web
+
+categories:
+  - knowledge-management
+
+developmentStatus: concept
+
+softwareType: "standalone/other"
+
+description:
+  nl:
+    localisedName: GBO-quality
+    shortDescription: >
+      Kwaliteitscontrole bij de ontwikkeling van de GBO-componenten.
+    longDescription: >
+      GBO-quality ondersteunt de kwaliteitscontrole bij de ontwikkeling van de
+      componenten van de Gemeenschappelijke Bronontsluiting (GBO), zoals
+      beschreven in de repositories GBO, GBO-GO, GBO-PSA, GBO-TO en
+      GBO-Semantiek. De repository legt vast aan welke kwaliteitseisen de
+      ontwikkeling moet voldoen, hoe die getoetst worden en wat de uitkomsten
+      zijn.
+    features:
+      - Kwaliteitseisen
+      - Toetsing
+
+legal:
+  license: EUPL-1.2
+
+maintenance:
+  type: "community"
+  contacts:
+    - name: Govert Claus
+
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - nl
