@@ -1,0 +1,200 @@
+# Herbruikbare workflow: build, tests, statische analyse, kwetsbaarheden en SBOM.
+# ICTU Kwaliteitsaanpak: M04 (regressietests), M07 (pipeline), M16 (tools).
+#
+# Aanroepen vanuit een GBO-repository, zie templates/.github/workflows/ci.yml.
+# Stappen waarvoor een secret ontbreekt worden overgeslagen met een waarschuwing,
+# tenzij de bijbehorende require-input op true staat.
+name: GBO quality CI
+
+on:
+  workflow_call:
+    inputs:
+      quality-ref:
+        description: Versie (tag/branch/sha) van ICTU/GBO-quality waarvan de scripts worden gebruikt.
+        type: string
+        default: v0
+      go-version:
+        type: string
+        default: ""
+      node-version:
+        type: string
+        default: ""
+      python-version:
+        type: string
+        default: ""
+      java-version:
+        type: string
+        default: ""
+      install-command:
+        description: Dependencies installeren (optioneel).
+        type: string
+        default: ""
+      build-command:
+        description: Bouwen, inclusief eventueel container-image (optioneel).
+        type: string
+        default: ""
+      test-command:
+        description: Unit- en regressietests, inclusief dekkingsrapport voor SonarQube.
+        type: string
+        required: true
+      run-pre-commit:
+        type: boolean
+        default: true
+      image-ref:
+        description: Container-image dat door build-command is gebouwd en gescand moet worden (optioneel).
+        type: string
+        default: ""
+      sonar-host-url:
+        type: string
+        default: ""
+      require-sonar:
+        description: Laat de build falen als SonarQube niet is geconfigureerd.
+        type: boolean
+        default: false
+      dependency-track-url:
+        type: string
+        default: ""
+      dependency-track-project:
+        description: Projectnaam in Dependency-Track (standaard de repositorynaam).
+        type: string
+        default: ""
+      trivy-version:
+        description: Versie van het Trivy-image. Werk bij via een PR en kies een versie die minstens 14 dagen oud is.
+        type: string
+        default: "0.58.1"
+      vulnerability-severity:
+        type: string
+        default: "CRITICAL,HIGH"
+    secrets:
+      SONAR_TOKEN:
+        required: false
+      DT_API_KEY:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TRIVY_IMAGE: aquasec/trivy:${{ inputs.trivy-version }}
+      SONAR_CONFIGURED: ${{ secrets.SONAR_TOKEN != '' && inputs.sonar-host-url != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0 # nodig voor SonarQube (nieuwe code) en pre-commit
+
+      - name: Taalomgeving (Go)
+        if: inputs.go-version != ''
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version: ${{ inputs.go-version }}
+      - name: Taalomgeving (Node)
+        if: inputs.node-version != ''
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Taalomgeving (Python)
+        if: inputs.python-version != ''
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: ${{ inputs.python-version }}
+      - name: Taalomgeving (Java)
+        if: inputs.java-version != ''
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
+        with:
+          distribution: temurin
+          java-version: ${{ inputs.java-version }}
+
+      - name: Pre-commit (linters, formatters, secrets)
+        if: inputs.run-pre-commit
+        run: |
+          if [ ! -f .pre-commit-config.yaml ]; then
+            echo "::warning::Geen .pre-commit-config.yaml gevonden; stap overgeslagen."
+            exit 0
+          fi
+          pipx run pre-commit run --all-files --show-diff-on-failure
+
+      - name: Dependencies installeren
+        if: inputs.install-command != ''
+        run: ${{ inputs.install-command }}
+
+      - name: Bouwen
+        if: inputs.build-command != ''
+        run: ${{ inputs.build-command }}
+
+      - name: Tests (unit en regressie)
+        run: ${{ inputs.test-command }}
+
+      - name: SonarQube-analyse en quality gate
+        if: env.SONAR_CONFIGURED == 'true'
+        uses: SonarSource/sonarqube-scan-action@2f77a1ec69fb1d595b06f35ab27e97605bdef703 # v5.3.2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ inputs.sonar-host-url }}
+        with:
+          args: -Dsonar.qualitygate.wait=true
+
+      - name: SonarQube niet geconfigureerd
+        if: env.SONAR_CONFIGURED != 'true'
+        env:
+          REQUIRE: ${{ inputs.require-sonar }}
+        run: |
+          if [ "$REQUIRE" = "true" ]; then
+            echo "::error::SonarQube is verplicht maar SONAR_TOKEN of sonar-host-url ontbreekt."
+            exit 1
+          fi
+          echo "::warning::SonarQube overgeslagen: SONAR_TOKEN of sonar-host-url ontbreekt."
+
+      - name: Kwetsbaarheden, secrets en misconfiguraties in de repository (Trivy)
+        env:
+          SEVERITY: ${{ inputs.vulnerability-severity }}
+        run: |
+          mkdir -p "$HOME/.cache/trivy"
+          docker run --rm -v "$PWD:/src" -v "$HOME/.cache/trivy:/root/.cache/trivy" -w /src "$TRIVY_IMAGE" \
+            fs --scanners vuln,secret,misconfig --severity "$SEVERITY" --exit-code 1 --no-progress .
+
+      - name: Kwetsbaarheden in het container-image (Trivy)
+        if: inputs.image-ref != ''
+        env:
+          SEVERITY: ${{ inputs.vulnerability-severity }}
+          IMAGE_REF: ${{ inputs.image-ref }}
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$HOME/.cache/trivy:/root/.cache/trivy" \
+            "$TRIVY_IMAGE" image --severity "$SEVERITY" --exit-code 1 --no-progress "$IMAGE_REF"
+
+      - name: SBOM (CycloneDX)
+        run: |
+          docker run --rm -v "$PWD:/src" -v "$HOME/.cache/trivy:/root/.cache/trivy" -w /src "$TRIVY_IMAGE" \
+            fs --format cyclonedx --output sbom.cdx.json --no-progress .
+
+      - name: SBOM bewaren
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sbom-cyclonedx
+          path: sbom.cdx.json
+          retention-days: 30
+
+      - name: SBOM naar Dependency-Track (alleen default branch)
+        if: >-
+          github.event_name == 'push' &&
+          github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        env:
+          DT_API_KEY: ${{ secrets.DT_API_KEY }}
+          DT_URL: ${{ inputs.dependency-track-url }}
+          DT_PROJECT: ${{ inputs.dependency-track-project || github.event.repository.name }}
+        run: |
+          if [ -z "$DT_API_KEY" ] || [ -z "$DT_URL" ]; then
+            echo "::warning::Dependency-Track overgeslagen: DT_API_KEY of dependency-track-url ontbreekt."
+            exit 0
+          fi
+          curl --fail --silent --show-error -X POST "$DT_URL/api/v1/bom" \
+            -H "X-Api-Key: $DT_API_KEY" \
+            -F "autoCreate=true" \
+            -F "projectName=$DT_PROJECT" \
+            -F "projectVersion=main" \
+            -F "bom=@sbom.cdx.json"

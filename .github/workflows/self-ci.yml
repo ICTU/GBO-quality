@@ -1,0 +1,32 @@
+# Controleert deze repository zelf.
+name: Self CI
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint-en-test:
+    name: lint-en-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Workflows controleren (actionlint)
+        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.7 -color
+      - name: Shellscripts controleren (shellcheck)
+        run: shellcheck scripts/*.sh claude/hooks/*.sh
+      - name: Unittests scripts
+        run: python3 -m unittest discover -s tests -v
+      - name: Pre-commit
+        run: pipx run pre-commit run --all-files --show-diff-on-failure
+
+  pr:
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/pr-checks.yml
+    with:
+      quality-ref: ${{ github.sha }}

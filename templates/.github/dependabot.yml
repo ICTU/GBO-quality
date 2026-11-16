@@ -1,0 +1,28 @@
+# Dependency-updates volgens kwaliteitsplan §5: wekelijks, met 14 dagen cooldown.
+# Beveiligingsupdates vallen niet onder de cooldown.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+
+  # Zet aan voor de taal van de component:
+  # - package-ecosystem: gomod        # of: npm, pip, maven, gradle
+  #   directory: /
+  #   schedule:
+  #     interval: weekly
+  #   cooldown:
+  #     default-days: 14

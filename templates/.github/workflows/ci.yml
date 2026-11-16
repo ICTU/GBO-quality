@@ -1,0 +1,54 @@
+# CI voor een GBO-component. Roept de centrale workflows uit ICTU/GBO-quality aan.
+# Pas de inputs aan op de component; zie docs/repo-aansluiten.md in GBO-quality.
+name: CI
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "30 2 * * 1-5" # nachtelijke run: nieuwe kwetsbaarheden en volledige scans
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    # Bij een PR-beschrijvingswijziging (edited) hoeft de volledige build niet opnieuw.
+    if: github.event.action != 'edited' && github.event.action != 'labeled' && github.event.action != 'unlabeled'
+    uses: ICTU/GBO-quality/.github/workflows/quality-ci.yml@v0
+    with:
+      quality-ref: v0
+      go-version: ""          # bijv. "1.23"
+      node-version: ""        # bijv. "22"
+      python-version: ""      # bijv. "3.12"
+      java-version: ""        # bijv. "21"
+      install-command: ""
+      build-command: ""
+      test-command: echo "TODO - vul het testcommando in" && exit 1
+      image-ref: ""           # bijv. "gbo-component:ci" als build-command een image bouwt
+      sonar-host-url: ${{ vars.SONAR_HOST_URL }}
+      dependency-track-url: ${{ vars.DT_URL }}
+    secrets: inherit
+
+  pr:
+    if: github.event_name == 'pull_request'
+    uses: ICTU/GBO-quality/.github/workflows/pr-checks.yml@v0
+    with:
+      quality-ref: v0
+
+  # Zet aan zodra de component in de runner of op een testomgeving kan draaien.
+  # dynamic:
+  #   if: github.event_name != 'pull_request'
+  #   uses: ICTU/GBO-quality/.github/workflows/dynamic-scans.yml@v0
+  #   with:
+  #     start-command: docker compose up -d
+  #     target-url: http://localhost:8080
+  #     run-zap: true
+  #     run-axe: false   # true voor componenten met een gebruikersinterface

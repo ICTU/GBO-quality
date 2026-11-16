@@ -1,0 +1,102 @@
+# Herbruikbare workflow: release bij een versietag (vX.Y.Z).
+# Levert release notes, SBOM en (optioneel) build-provenance voor artefacten.
+# ICTU Kwaliteitsaanpak: M01 (release notes, SBOM, deploybare versie), M07 (oplevering).
+name: GBO release
+
+on:
+  workflow_call:
+    inputs:
+      build-command:
+        description: Bouwt de release-artefacten (optioneel).
+        type: string
+        default: ""
+      artifact-paths:
+        description: Artefacten (glob, één per regel) om aan de release te hangen en te attesteren (optioneel).
+        type: string
+        default: ""
+      git-cliff-version:
+        type: string
+        default: "2.6.1"
+      trivy-version:
+        type: string
+        default: "0.58.1"
+      dependency-track-url:
+        type: string
+        default: ""
+      dependency-track-project:
+        type: string
+        default: ""
+    secrets:
+      DT_API_KEY:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # release aanmaken
+      id-token: write      # build-provenance
+      attestations: write  # build-provenance
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Bouwen
+        if: inputs.build-command != ''
+        run: ${{ inputs.build-command }}
+
+      - name: Release notes (git-cliff, uit Conventional Commits)
+        env:
+          CLIFF_VERSION: ${{ inputs.git-cliff-version }}
+        run: |
+          pipx run "git-cliff==$CLIFF_VERSION" --latest --strip header --output RELEASE_NOTES.md
+          cat RELEASE_NOTES.md
+
+      - name: SBOM (CycloneDX)
+        env:
+          TRIVY_IMAGE: aquasec/trivy:${{ inputs.trivy-version }}
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src "$TRIVY_IMAGE" \
+            fs --format cyclonedx --output "sbom-${GITHUB_REF_NAME}.cdx.json" --no-progress .
+
+      - name: Build-provenance attesteren
+        if: inputs.artifact-paths != ''
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+        with:
+          subject-path: ${{ inputs.artifact-paths }}
+
+      - name: GitHub-release aanmaken
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACTS: ${{ inputs.artifact-paths }}
+        run: |
+          files=("sbom-${GITHUB_REF_NAME}.cdx.json")
+          while IFS= read -r pattern; do
+            [ -z "$pattern" ] && continue
+            for f in $pattern; do [ -f "$f" ] && files+=("$f"); done
+          done <<< "$ARTIFACTS"
+          gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" \
+            --notes-file RELEASE_NOTES.md --verify-tag "${files[@]}"
+
+      - name: SBOM naar Dependency-Track
+        env:
+          DT_API_KEY: ${{ secrets.DT_API_KEY }}
+          DT_URL: ${{ inputs.dependency-track-url }}
+          DT_PROJECT: ${{ inputs.dependency-track-project || github.event.repository.name }}
+        run: |
+          if [ -z "$DT_API_KEY" ] || [ -z "$DT_URL" ]; then
+            echo "::warning::Dependency-Track overgeslagen: DT_API_KEY of dependency-track-url ontbreekt."
+            exit 0
+          fi
+          curl --fail --silent --show-error -X POST "$DT_URL/api/v1/bom" \
+            -H "X-Api-Key: $DT_API_KEY" \
+            -F "autoCreate=true" \
+            -F "projectName=$DT_PROJECT" \
+            -F "projectVersion=$GITHUB_REF_NAME" \
+            -F "bom=@sbom-${GITHUB_REF_NAME}.cdx.json"

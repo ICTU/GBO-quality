@@ -1,0 +1,3 @@
+# Vul teams of personen in voordat je "Require review from Code Owners" aanzet.
+*                      @ICTU/gbo-ontwikkelaars
+/.github/workflows/    @ICTU/gbo-ontwikkelaars @ICTU/gbo-kwaliteitsmanager

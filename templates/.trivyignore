@@ -1,0 +1,4 @@
+# Geaccepteerde kwetsbaarheden. Per regel: CVE-ID, met daarboven reden, issue en vervaldatum.
+# Voorbeeld:
+# # Niet exploiteerbaar: functie wordt niet gebruikt. Issue GBO-321. Vervalt 2027-03-01.
+# CVE-2026-12345

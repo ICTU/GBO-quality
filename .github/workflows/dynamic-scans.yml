@@ -1,0 +1,112 @@
+# Herbruikbare workflow: dynamische beveiligingsscan (ZAP) en toegankelijkheidstest (axe)
+# tegen een draaiende omgeving. ICTU Kwaliteitsaanpak: M07, M16.
+#
+# Twee manieren om een doel te hebben:
+# 1. target-url wijst naar een bereikbare testomgeving;
+# 2. start-command start de component in de runner (bijv. docker compose up -d) en
+#    target-url is dan http://localhost:<poort>.
+name: GBO dynamic scans
+
+on:
+  workflow_call:
+    inputs:
+      target-url:
+        description: Basis-URL van de draaiende component.
+        type: string
+        required: true
+      start-command:
+        description: Start de component in de runner (optioneel).
+        type: string
+        default: ""
+      run-zap:
+        type: boolean
+        default: true
+      zap-fail-on-warning:
+        description: Laat ook ZAP-waarschuwingen de build laten falen.
+        type: boolean
+        default: false
+      zap-image:
+        type: string
+        default: ghcr.io/zaproxy/zaproxy:stable # TODO: vastpinnen op een versie of digest
+      run-axe:
+        description: Alleen zinvol voor componenten met een gebruikersinterface.
+        type: boolean
+        default: false
+      axe-paths:
+        description: Paden (één per regel) die axe test, relatief aan target-url.
+        type: string
+        default: "/"
+      axe-cli-version:
+        type: string
+        default: "4.10.1"
+
+permissions:
+  contents: read
+
+jobs:
+  scans:
+    name: dynamic-scans
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      TARGET_URL: ${{ inputs.target-url }}
+    steps:
+      - name: Checkout
+        if: inputs.start-command != ''
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Component starten
+        if: inputs.start-command != ''
+        run: ${{ inputs.start-command }}
+
+      - name: Wachten tot de component bereikbaar is
+        run: |
+          for _ in $(seq 1 60); do
+            if curl --silent --output /dev/null "$TARGET_URL"; then echo "Bereikbaar."; exit 0; fi
+            sleep 5
+          done
+          echo "::error::$TARGET_URL is niet bereikbaar."
+          exit 1
+
+      - name: ZAP-baseline-scan
+        if: inputs.run-zap
+        env:
+          ZAP_IMAGE: ${{ inputs.zap-image }}
+          FAIL_ON_WARN: ${{ inputs.zap-fail-on-warning }}
+        run: |
+          mkdir -p zap && chmod a+w zap
+          extra=""
+          if [ "$FAIL_ON_WARN" != "true" ]; then extra="-I"; fi
+          rules=""
+          if [ -f .zap/rules.tsv ]; then cp .zap/rules.tsv zap/rules.tsv; rules="-c rules.tsv"; fi
+          # shellcheck disable=SC2086
+          docker run --rm --network host -v "$PWD/zap:/zap/wrk:rw" "$ZAP_IMAGE" \
+            zap-baseline.py -t "$TARGET_URL" -J zap-report.json -r zap-report.html $rules $extra
+
+      - name: Toegankelijkheid (axe, WCAG 2.2 AA)
+        if: inputs.run-axe
+        env:
+          AXE_PATHS: ${{ inputs.axe-paths }}
+          AXE_VERSION: ${{ inputs.axe-cli-version }}
+        run: |
+          mkdir -p axe
+          urls=""
+          while IFS= read -r path; do
+            [ -z "$path" ] && continue
+            urls="$urls,${TARGET_URL%/}$path"
+          done <<< "$AXE_PATHS"
+          npx --yes "@axe-core/cli@$AXE_VERSION" "${urls#,}" \
+            --tags wcag2a,wcag2aa,wcag21a,wcag21aa,wcag22aa \
+            --chromedriver-path "$CHROMEWEBDRIVER/chromedriver" \
+            --save axe-results.json --dir axe --exit
+
+      - name: Rapporten bewaren
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dynamic-scan-rapporten
+          path: |
+            zap/
+            axe/
+          if-no-files-found: ignore
+          retention-days: 30

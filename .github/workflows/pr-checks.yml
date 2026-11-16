@@ -1,0 +1,72 @@
+# Herbruikbare workflow: werkafspraken bij een pull request.
+# ICTU Kwaliteitsaanpak: M03 (traceerbaarheid), M02/M05 (Definition of Done).
+#
+# Laat de aanroepende workflow reageren op pull_request met types
+# [opened, edited, synchronize, reopened, labeled, unlabeled], zodat het bijwerken
+# van de PR-beschrijving de controle opnieuw start.
+name: GBO PR checks
+
+on:
+  workflow_call:
+    inputs:
+      quality-ref:
+        description: Versie (tag/branch/sha) van ICTU/GBO-quality waarvan de scripts worden gebruikt.
+        type: string
+        default: v0
+      trace-pattern:
+        description: Reguliere expressie voor story- of issueverwijzingen. Leeg = standaard (GBO-123 of #45).
+        type: string
+        default: ""
+      skip-label:
+        description: Label waarmee de traceerbaarheidscheck bewust wordt overgeslagen.
+        type: string
+        default: geen-story
+
+permissions:
+  contents: read
+
+jobs:
+  traceerbaarheid:
+    name: traceerbaarheid
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Scripts ophalen
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          repository: ICTU/GBO-quality
+          ref: ${{ inputs.quality-ref }}
+          path: .gbo-quality
+      - name: Controleer verwijzing naar story of issue
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          TRACE_PATTERN: ${{ inputs.trace-pattern }}
+          IS_BOT: ${{ github.event.pull_request.user.type == 'Bot' }}
+          SKIPPED: ${{ contains(github.event.pull_request.labels.*.name, inputs.skip-label) }}
+        run: |
+          if [ "$IS_BOT" = "true" ]; then echo "PR van een bot; overgeslagen."; exit 0; fi
+          if [ "$SKIPPED" = "true" ]; then
+            echo "::warning::Traceerbaarheidscheck overgeslagen via label."
+            exit 0
+          fi
+          python3 .gbo-quality/scripts/check_traceability.py
+
+  definition-of-done:
+    name: definition-of-done
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Scripts ophalen
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          repository: ICTU/GBO-quality
+          ref: ${{ inputs.quality-ref }}
+          path: .gbo-quality
+      - name: Controleer Definition of Done in de PR-beschrijving
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          IS_BOT: ${{ github.event.pull_request.user.type == 'Bot' }}
+        run: |
+          if [ "$IS_BOT" = "true" ]; then echo "PR van een bot; overgeslagen."; exit 0; fi
+          python3 .gbo-quality/scripts/check_dod.py
