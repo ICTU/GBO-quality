@@ -22,4 +22,5 @@ We streven ernaar binnen vijf werkdagen te reageren.
 ## Contactpersoon
 
 Eigenaar: ICTU - programma GBO
+
 Contactpersoon: [Govert Claus](mailto:govert.claus@ictu.nl)
