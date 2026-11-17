@@ -18,7 +18,15 @@ Zie README.md voor de opzet en docs/kwaliteitsplan.md voor de normen.
 - Baseer kwaliteitseisen en uitspraken in docs/ op de bronnen in bronnen-md/
   (o.a. ICTU-Kwaliteitsaanpak.md, v5.4.1; maatregelen staan als kop "M01: ..." t/m "M35: ...").
   Zoek gericht op het maatregelnummer in plaats van het hele document te lezen.
-  Gebruik alleen een andere bron als bronnen-md/ het antwoord niet geeft, en zeg dat dan expliciet.
+- Voor informatiebeveiliging is bronnen-md/BIO2-v1.3.md de bron (Baseline Informatiebeveiliging Overheid 2,
+  v1.3). Overheidsmaatregelen staan als kop "#### 8.32.01"; de eerste drie cijfers verwijzen naar de
+  beheersmaatregel uit NEN-EN-ISO/IEC 27002:2022. Vermeld als "(bron: BIO2 v1.3, 8.32.01)".
+- NEN-EN-ISO/IEC 27001:2023 en 27002:2022 staan alleen in een lokale map buiten de repository; vraag de
+  gebruiker naar het pad als je ze nodig hebt. Deze normen zijn auteursrechtelijk beschermd en niet
+  openbaar: kopieer ze nooit naar deze repository, neem geen normtekst over in docs/ of andere bestanden,
+  en verwijs alleen naar het nummer van de beheersmaatregel met een eigen samenvatting, bijvoorbeeld
+  "(bron: NEN-EN-ISO/IEC 27002:2022, 8.28)".
+- Gebruik alleen een andere bron als bovenstaande bronnen het antwoord niet geven, en zeg dat dan expliciet.
 - Vermeld bij elke inhoudelijke uitspraak in docs/ de bron, in de vorm
   "(bron: ICTU Kwaliteitsaanpak v5.4.1, M26)". Noem de gebruikte bronnen ook in de PR-beschrijving.
 - Bewerk bronnen-orig/ en bronnen-md/ niet; dit zijn kopieën van de originelen.
