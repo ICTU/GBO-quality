@@ -11,21 +11,23 @@ Story/issue: <!-- bijv. GBO-123 of Closes #45 (verplicht, ICTU-maatregel M03) --
 ## Definition of Done
 
 <!--
-Vink elk item af. Is een item niet van toepassing, laat het open en zet erachter
-"n.v.t.: <reden>". De pipeline controleert deze lijst.
+Hier staan alleen de punten die een mens moet beoordelen. Codeerstandaard, review, slagende tests,
+SonarQube en de kwetsbaarhedenscan borgen de pipeline en de branch protection; de demo hoort bij de
+sprint review.
+
+Vink elk item af. Is een item niet van toepassing, laat het open en zet erachter "n.v.t.: <reden>".
+Items met een markering <!- - dod:... - -> vervallen vanzelf als de PR de bijbehorende paden niet raakt
+(zie dod-regels in .github/workflows/ci.yml). De pipeline controleert deze lijst.
 -->
 
 <!-- dod:start -->
-- [ ] Code voldoet aan de codeerstandaard en is door een andere ontwikkelaar gereviewd
-- [ ] Nieuwe en gewijzigde testgevallen zijn gereviewd
 - [ ] Tests verwijzen naar de logische testgevallen (traceerbaarheid)
-- [ ] Alle pipeline-checks slagen, inclusief SonarQube quality gate en kwetsbaarhedenscan
 - [ ] Documentatie is bijgewerkt (README, API-schema, installatie- en beheerdocumentatie)
 - [ ] Architectuurbeslissing vastgelegd in een ADR en het SAD bijgewerkt
-- [ ] Conformancetests bijgewerkt bij een wijziging van een koppelvlak
-- [ ] Toegankelijkheidstest slaagt bij een wijziging van de gebruikersinterface
 - [ ] Geen secrets, echte persoonsgegevens of BSN's in code, tests of logging
-- [ ] Demo voor de sprint review is voorbereid
+- [ ] Conformancetests bijgewerkt bij een wijziging van een koppelvlak <!-- dod:koppelvlak -->
+- [ ] Toegankelijkheidstest slaagt bij een wijziging van de gebruikersinterface <!-- dod:ui -->
+- [ ] Risicoanalyse bijgewerkt bij een significante wijziging (nieuw koppelvlak, nieuw soort gegevens, nieuwe hosting) <!-- dod:risico -->
 <!-- dod:end -->
 
 ## Aandachtspunten voor de reviewer

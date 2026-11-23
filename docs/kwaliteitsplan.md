@@ -90,10 +90,28 @@ Een user story is *done* als:
    installatie- en beheerdocumentatie;
 8. bij een wijziging van een koppelvlak de conformancetests zijn bijgewerkt;
 9. bij componenten met een gebruikersinterface de toegankelijkheidstest slaagt;
-10. de demo voor de sprint review is voorbereid.
+10. de demo voor de sprint review is voorbereid;
+11. bij een significante wijziging de risicoanalyse van de component is bijgewerkt (zie §8.2) (bron: BIO2
+    v1.3, 5.08.01).
 
-Het PR-template (`templates/.github/pull_request_template.md`) bevat deze lijst. De pipeline controleert dat
-elk item is afgevinkt of expliciet als *n.v.t.* is gemarkeerd.
+Voldoen aan de kwaliteitsnormen is onderdeel van de Definition of Done (bron: ICTU Kwaliteitsaanpak
+v5.4.1, M02). Om de ontwikkelaar niet te belasten met afvinken van wat al vaststaat, is de borging per
+item verdeeld:
+
+| Item | Borging |
+|---|---|
+| 1, 3, 4, 5 | Pipeline en branch protection: pre-commit en linters, verplichte review, verplichte status checks (SonarQube, Trivy) |
+| 2 | Onderdeel van de verplichte review van de pull request |
+| 6 | Story-ID: traceerbaarheidscheck in de pipeline; verwijzing naar logische testgevallen: DoD-item in de PR |
+| 7 | DoD-item in de PR |
+| 8, 9, 11 | Voorwaardelijk DoD-item in de PR: vervalt automatisch als de PR de bijbehorende paden niet raakt |
+| 10 | Sprint review, niet per pull request |
+
+Het PR-template (`templates/.github/pull_request_template.md`) bevat alleen de items die een mens moet
+beoordelen. De pipeline controleert dat elk item is afgevinkt of expliciet als *n.v.t.* is gemarkeerd.
+Een voorwaardelijk item draagt een sleutel (`<!-- dod:koppelvlak -->`); de input `dod-regels` van de
+workflow koppelt die sleutel aan paden in de repository. Raakt de PR geen van die paden, dan is het
+item niet van toepassing zonder dat de ontwikkelaar iets hoeft te doen.
 
 ### Broncodereviews
 

@@ -37,6 +37,8 @@ Normen staan in `references/normen.md`. De review-checklist staat in `references
 5. Vul het PR-template in (`.github/pull_request_template.md`):
    - beschrijf wat en waarom, en hoe getest;
    - vink alleen gecontroleerde items af; markeer niet-relevante items als `n.v.t.: <reden>`;
+   - items met een markering `<!-- dod:... -->` laat je ongemoeid als de PR de paden uit `dod-regels`
+     in `.github/workflows/ci.yml` niet raakt: de pipeline stelt dan zelf vast dat ze niet gelden;
    - benoem onder "Aandachtspunten voor de reviewer" de risico's en wat je niet kon controleren.
 6. Maak de PR aan met `gh pr create` als de gebruiker dat wil.
 
