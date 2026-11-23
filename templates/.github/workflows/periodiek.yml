@@ -1,0 +1,22 @@
+# Periodieke controles en kwaliteitskalender (kwaliteitsplan §6, §8.4 en §8.5). Draait wekelijks en
+# kan handmatig worden gestart. Pas de taken aan in .github/kwaliteitskalender.yml.
+name: Periodieke controles
+
+on:
+  schedule:
+    - cron: "0 5 * * 1" # maandag 05:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  periodiek:
+    uses: ICTU/GBO-quality/.github/workflows/periodieke-controles.yml@v0
+    permissions:
+      contents: read
+      issues: write
+    with:
+      quality-ref: v0
+      image-ref: ""   # bijv. ghcr.io/ictu/gbo-component:latest
+    secrets: inherit  # optioneel GBO_AUDIT_TOKEN, voor MFA en beheerders

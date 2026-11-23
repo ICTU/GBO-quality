@@ -1,0 +1,161 @@
+# Herbruikbare workflow: periodieke controles en kwaliteitskalender (kwaliteitsplan §6, §8.4 en §8.5).
+# Draai wekelijks vanuit een GBO-repository, zie templates/.github/workflows/periodiek.yml.
+#
+# - kalender:        issues voor periodieke taken (pentest, self-assessment, training ...) en het label
+#                    te-laat op issues waarvan de deadline verstreken is;
+# - kwetsbaarheden:  Trivy-scan van repository en (optioneel) image; issue per kwetsbaarheid met deadline,
+#                    automatisch heropenen en sluiten;
+# - toegang:         MFA in de organisatie, beheerders en bescherming van de standaardbranch.
+name: GBO periodieke controles
+
+on:
+  workflow_call:
+    inputs:
+      quality-ref:
+        description: Versie (tag/branch/sha) van ICTU/GBO-quality waarvan de scripts worden gebruikt.
+        type: string
+        default: v0
+      kalender:
+        description: Pad naar de kwaliteitskalender in de aanroepende repository.
+        type: string
+        default: .github/kwaliteitskalender.yml
+      image-ref:
+        description: Container-image om ook te scannen, bijv. ghcr.io/ictu/component:latest (optioneel).
+        type: string
+        default: ""
+      vulnerability-severity:
+        type: string
+        default: "CRITICAL,HIGH"
+      termijn-kwetsbaarheden:
+        description: Dagen tot de deadline van een nieuw kwetsbaarheden-issue (BIO2 8.08.01).
+        type: number
+        default: 7
+      trivy-version:
+        type: string
+        default: "0.58.1"
+      pyyaml-version:
+        type: string
+        default: "6.0.2"
+    secrets:
+      GBO_AUDIT_TOKEN:
+        description: Token met leesrecht op de organisatie en de repository-instellingen (voor MFA en beheerders).
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  kalender:
+    name: kalender
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Scripts ophalen
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          repository: ICTU/GBO-quality
+          ref: ${{ inputs.quality-ref }}
+          path: .gbo-quality
+          persist-credentials: false
+      - name: PyYAML installeren
+        env:
+          PYYAML: ${{ inputs.pyyaml-version }}
+        run: python3 -m venv "$RUNNER_TEMP/venv" && "$RUNNER_TEMP/venv/bin/pip" install -q "pyyaml==$PYYAML"
+      - name: Issues voor de taken van deze periode
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KALENDER: ${{ inputs.kalender }}
+        run: |
+          if [ ! -f "$KALENDER" ]; then
+            echo "::warning::Geen kwaliteitskalender gevonden ($KALENDER); stap overgeslagen."
+            exit 0
+          fi
+          "$RUNNER_TEMP/venv/bin/python" .gbo-quality/scripts/kwaliteitskalender.py issues "$KALENDER"
+      - name: Te late issues markeren
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          "$RUNNER_TEMP/venv/bin/python" .gbo-quality/scripts/kwaliteitskalender.py te-laat
+          --label kwaliteitskalender --label kwetsbaarheid
+
+  kwetsbaarheden:
+    name: kwetsbaarheden
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    env:
+      TRIVY_IMAGE: aquasec/trivy:${{ inputs.trivy-version }}
+      SEVERITY: ${{ inputs.vulnerability-severity }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Scripts ophalen
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          repository: ICTU/GBO-quality
+          ref: ${{ inputs.quality-ref }}
+          path: .gbo-quality
+          persist-credentials: false
+      - name: Scan repository (Trivy)
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src "$TRIVY_IMAGE" fs --skip-dirs .gbo-quality \
+            --scanners vuln --severity "$SEVERITY" --format json --output trivy-fs.json --no-progress .
+      - name: Scan image (Trivy)
+        if: inputs.image-ref != ''
+        env:
+          IMAGE_REF: ${{ inputs.image-ref }}
+        run: |
+          docker run --rm -v "$PWD:/src" -w /src "$TRIVY_IMAGE" image \
+            --severity "$SEVERITY" --format json --output trivy-image.json --no-progress "$IMAGE_REF"
+      - name: Issues bijwerken
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TERMIJN: ${{ inputs.termijn-kwetsbaarheden }}
+        run: |
+          python3 .gbo-quality/scripts/kwetsbaarheden.py trivy-*.json \
+            --ernst "$SEVERITY" --termijn "$TERMIJN" --trivyignore .trivyignore
+
+  toegang:
+    name: toegang
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Scripts ophalen
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          repository: ICTU/GBO-quality
+          ref: ${{ inputs.quality-ref }}
+          path: .gbo-quality
+          persist-credentials: false
+      - name: PyYAML installeren
+        env:
+          PYYAML: ${{ inputs.pyyaml-version }}
+        run: python3 -m venv "$RUNNER_TEMP/venv" && "$RUNNER_TEMP/venv/bin/pip" install -q "pyyaml==$PYYAML"
+      - name: Toegang controleren
+        env:
+          # Het audittoken leest organisatie en collaborators; issues gaan met het workflowtoken.
+          AUDIT_TOKEN: ${{ secrets.GBO_AUDIT_TOKEN }}
+          WORKFLOW_TOKEN: ${{ github.token }}
+          KALENDER: ${{ inputs.kalender }}
+        run: |
+          [ -f "$KALENDER" ] || printf 'beheerders: []\n' > "$RUNNER_TEMP/leeg.yml"
+          [ -f "$KALENDER" ] || KALENDER="$RUNNER_TEMP/leeg.yml"
+          if [ -z "$AUDIT_TOKEN" ]; then
+            echo "::warning::GBO_AUDIT_TOKEN ontbreekt; MFA en beheerders zijn niet te controleren."
+          fi
+          GH_TOKEN="${AUDIT_TOKEN:-$WORKFLOW_TOKEN}" GH_ISSUE_TOKEN="$WORKFLOW_TOKEN" \
+            "$RUNNER_TEMP/venv/bin/python" .gbo-quality/scripts/toegangscontrole.py "$KALENDER" \
+            --rapport toegangscontrole.md
+          cat toegangscontrole.md >> "$GITHUB_STEP_SUMMARY"

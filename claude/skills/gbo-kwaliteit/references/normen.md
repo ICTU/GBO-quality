@@ -20,4 +20,8 @@ Bij verschil geldt het kwaliteitsplan.
 | Pentest internetfacing componenten | Bij elke nieuwe release of major update; hoog risico zonder mitigatie blokkeert productie |
 | Logging | Actie, object, resultaat, oorsprong, actor, tijdstempel; nooit BSN's, wachtwoorden, tokens of sleutels |
 | Cryptografie | Volgens NCSC-adviezen, via bewezen bibliotheken; sleutels nooit in de code |
-| Toegang | MFA verplicht voor GitHub en ontwikkeltooling |
+| Toegang | MFA verplicht voor GitHub en ontwikkeltooling; wekelijkse automatische toegangscontrole |
+| Kwetsbaarheden-issues | Nachtelijke/wekelijkse scan maakt issue met deadline 7 dagen; risicoafweging in het issue |
+| Uitzondering kwetsbaarheid | In `.trivyignore` met reden, issue en `exp:JJJJ-MM-DD` |
+| Bewijs per release | Testrapport en bewijsbundel automatisch; rollbackinstructie in `docs/rollback.md` |
+| Kwaliteitskalender | Pentest en self-assessment halfjaarlijks; toegangsrechten per kwartaal; register, training en risicoanalyses jaarlijks |

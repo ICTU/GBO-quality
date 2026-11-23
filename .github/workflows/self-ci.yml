@@ -21,7 +21,10 @@ jobs:
       - name: Shellscripts controleren (shellcheck)
         run: shellcheck scripts/*.sh claude/hooks/*.sh
       - name: Unittests scripts
-        run: python3 -m unittest discover -s tests -v
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install -q pyyaml==6.0.2
+          "$RUNNER_TEMP/venv/bin/python" -m unittest discover -s tests -v
       - name: Pre-commit
         run: pipx run pre-commit run --all-files --show-diff-on-failure
 

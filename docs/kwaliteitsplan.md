@@ -154,7 +154,8 @@ waar ze in de pipeline zitten.
 | Penetratietest en code review door experts | Elke grote release, minimaal 2× per jaar; voor internetfacing componenten bij elke nieuwe release of major update (zie §8.4) | Extern, via ICTU; waar mogelijk geautomatiseerd | M26, BIO2 8.08.05 |
 
 Van elke release wordt een testrapport gemaakt: welke tests zijn uitgevoerd, met welk resultaat, en welke
-bevindingen openstaan. Het mastertestplan beschrijft de gestructureerde testmethode (bron: BIO2 v1.3,
+bevindingen openstaan. De release-workflow maakt dit rapport automatisch (zie §6, *Vrijgave en bewijs per
+release*). Het mastertestplan beschrijft de gestructureerde testmethode (bron: BIO2 v1.3,
 8.29.01; NEN-EN-ISO/IEC 27002:2022, 8.29).
 
 ## 5. Beheer van dependencies
@@ -181,17 +182,60 @@ Gebaseerd op de ICTU-aanbevelingen voor het beheer van dependencies (template kw
   bespreekt ze in de daily scrum of het projectoverleg.
 - Technische schuld wordt gemarkeerd in Quality-time, geschat en planmatig opgelost: richtwaarde circa 10%
   van de sprintcapaciteit (M08).
-- De projectleider organiseert periodiek een self-assessment tegen de Kwaliteitsaanpak (M28). Gebruik daarvoor
-  de Quality-time-variant van de checklist (zie `quality-time/README.md`).
+- De projectleider organiseert periodiek een self-assessment tegen de Kwaliteitsaanpak (M28); zie de
+  kwaliteitskalender hieronder.
 - Escalatie bij langdurig niet halen van normen: kwaliteitsmanager → software delivery manager → projectleider
   → hoofd ICTU Software Expertise (M02).
 
-### Vrijgave
+### Kwaliteitskalender en periodieke controles
+
+Periodieke activiteiten staan in de kwaliteitskalender (`.github/kwaliteitskalender.yml` in de
+componentrepository). Een wekelijkse workflow maakt aan het begin van elke periode een issue met checklist,
+bron en deadline. Het issue sluiten, met het bewijs erbij, is de vastlegging. Een open issue na de
+deadline krijgt het label `te-laat`, zodat Quality-time het kan meten.
+
+| Activiteit | Frequentie | Bron |
+|---|---|---|
+| Penetratietest en code review door experts | Halfjaarlijks; internetfacing componenten ook bij elke release | ICTU Kwaliteitsaanpak v5.4.1, M26; BIO2 v1.3, 8.08.05; §4 en §8.4 |
+| Self-assessment tegen de Kwaliteitsaanpak | Halfjaarlijks (GBO-keuze; M28 zegt "periodiek") | ICTU Kwaliteitsaanpak v5.4.1, M28 |
+| Toegangsrechten op repository en tooling bevestigen | Per kwartaal (GBO-keuze) | BIO2 v1.3, 5.17.01; NEN-EN-ISO/IEC 27002:2022, 5.18; §8.5 |
+| Register van clouddiensten en tools herzien | Jaarlijks (GBO-keuze) | NEN-EN-ISO/IEC 27002:2022, 5.23; BIO2 v1.3, 5.23.01; §8.6 |
+| Training of workshop veilig programmeren | Jaarlijks | NEN-EN-ISO/IEC 27001:2023, 7.2; §8.9 |
+| Risicoanalyses nalopen op actualiteit | Jaarlijks (GBO-keuze), naast herhaling bij significante wijziging | BIO2 v1.3, 5.08.01; §8.2 |
+
+Naast de kalender controleert dezelfde workflow wekelijks automatisch:
+
+- **Kwetsbaarheden:** de Trivy-scan maakt per kwetsbaarheid met ernst critical of high een issue met een
+  deadline van 7 dagen en een checklist voor de risicoafweging; de afweging kan een andere termijn
+  vastleggen. Het issue wordt heropend als de kwetsbaarheid terugkomt (bijvoorbeeld na het verlopen van een
+  uitzondering) en gesloten als de scan hem niet meer vindt (bron: BIO2 v1.3, 8.08.01-8.08.03; §8.4).
+  Uitzonderingen in `.trivyignore` hebben een vervaldatum (`exp:JJJJ-MM-DD`).
+- **Toegang:** of de organisatie MFA verplicht stelt, welke leden geen MFA hebben, of alleen de benoemde
+  beheerders beheerrechten hebben en of `main` beschermd is. Het rapport staat bij elke run; een afwijking
+  wordt een issue dat vanzelf sluit als alles weer klopt (bron: BIO2 v1.3, 5.17.01;
+  NEN-EN-ISO/IEC 27002:2022, 8.2 en 8.4; §8.5).
+
+### Vrijgave en bewijs per release
 
 Bij elke major release levert het project informatie voor het vrijgaveadvies van de opdrachtgevende
 organisatie: gerealiseerde eisen en hoe die getoetst zijn, openstaande bugs, afwijkingen in de
-kwaliteitsrapportage met de risico's daarvan, overige risico's en het advies van ICTU. De release-workflow
-levert release notes, SBOM en build-provenance automatisch.
+kwaliteitsrapportage met de risico's daarvan, overige risico's en het advies van ICTU.
+
+De release-workflow levert dit grotendeels automatisch, bij elke release:
+
+- release notes uit Conventional Commits, met de rollbackinstructie (§8.8);
+- het testrapport (§4): resultaten van de geautomatiseerde tests op de getagde versie, traceerbaarheid en
+  dekking van de logische testgevallen, kwetsbaarheden en geaccepteerde uitzonderingen, gemergde pull
+  requests met hun reviewers, openstaande bugs en een samenvatting van de aandachtspunten;
+- een bewijsbundel (`bewijs-<versie>.zip`) met het testrapport, de onderliggende testresultaten en scans,
+  de SBOM, de gegevens over pull requests en reviews, herkomstgegevens en een SHA-256-manifest;
+- build-provenance voor SBOM, testrapport, bewijsbundel en artefacten.
+
+Falen de tests op de getagde versie, dan maakt de workflow geen release. De repository gebruikt *immutable
+releases*, zodat een release met zijn bijlagen na publicatie niet meer te wijzigen is. Zo blijft het bewijs
+beschikbaar en beschermd tegen wijziging, en is het bij afsluiting of overdracht direct te archiveren
+(bron: NEN-EN-ISO/IEC 27001:2023, 7.5.3; ICTU Kwaliteitsaanpak v5.4.1, M27 en M34). Resultaten van tests
+buiten de pipeline, zoals pentests, worden vastgelegd in het betreffende kalender-issue.
 
 ## 7. Aanvullende eisen voor GBO
 

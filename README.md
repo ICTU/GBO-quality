@@ -34,11 +34,17 @@ docs/
   quality-ci.yml             Herbruikbaar: pre-commit, tests, SonarQube, Trivy, SBOM, Dependency-Track
   pr-checks.yml              Herbruikbaar: traceerbaarheid (story-ID) en Definition of Done
   dynamic-scans.yml          Herbruikbaar: ZAP-baseline en axe-toegankelijkheidstest tegen een draaiende omgeving
-  release.yml                Herbruikbaar: release notes, SBOM en build-provenance bij een tag
+  release.yml                Herbruikbaar: release notes, SBOM, testrapport, bewijsbundel en build-provenance bij een tag
+  periodieke-controles.yml   Herbruikbaar: kwaliteitskalender, kwetsbaarheden-issues en toegangscontrole (wekelijks)
   self-ci.yml                Controleert deze repository zelf
 scripts/
   check_dod.py               Controleert of alle DoD-items in de PR afgevinkt of als n.v.t. gemarkeerd zijn
   check_traceability.py      Controleert of een PR naar een story of issue verwijst
+  testrapport.py             Maakt het testrapport van een release
+  verzamel_releasegegevens.py  Haalt gemergde PR's met reviewers en openstaande bugs op
+  kwaliteitskalender.py      Maakt issues voor periodieke taken en markeert te late issues
+  kwetsbaarheden.py          Maakt, heropent en sluit issues per kwetsbaarheid
+  toegangscontrole.py        Controleert MFA, beheerders en bescherming van main
   aansluiten.sh              Kopieert de templates naar een GBO-repository
 templates/                   Bestanden die in elke GBO-repository komen (o.a. AGENTS.md en CLAUDE.md)
 AGENTS.md                    Instructies voor AI-codeerassistenten in deze repository

@@ -4,7 +4,8 @@ Per maatregel uit de [ICTU Kwaliteitsaanpak](https://ictu.github.io/Kwaliteitsaa
 invult en waar dat zichtbaar is. Gebruik dit overzicht bij de self-assessment (M28).
 
 **Borging:** *Auto* = afgedwongen door de pipeline · *Proces* = werkafspraak, zichtbaar in tooling ·
-*Handmatig* = periodieke menselijke activiteit · *ICTU* = verantwoordelijkheid van de ICTU-organisatie,
+*Handmatig* = periodieke menselijke activiteit · *Kalender* = periodieke menselijke activiteit
+die de kwaliteitskalender als issue met deadline aanmaakt · *ICTU* = verantwoordelijkheid van de ICTU-organisatie,
 niet van het project.
 
 | Maatregel | Kern | GBO-invulling | Borging | Waar |
@@ -25,9 +26,9 @@ niet van het project.
 | M19 | Afgeschermde omgevingen | Aan te vragen bij ICTU ISD | ICTU + Proces | Open punt 3 |
 | M21 | Kwaliteit bij inzet medewerkers | — | ICTU | — |
 | M23 | Kennis van de Kwaliteitsaanpak | Onboarding via deze repository | Proces | `README.md` |
-| M26 | Periodieke securitybeoordeling | Pentest en code review per grote release, ≥ 2× per jaar; internetfacing componenten bij elke release | Handmatig | `kwaliteitsplan.md` §4 en §8.4, Quality-time |
-| M27 | Archivering bij afsluiting | Checklist bij fase-einde | Handmatig | Projectorganisatie |
-| M28 | Self-assessment | Checklist in Quality-time | Handmatig | `quality-time/README.md` |
+| M26 | Periodieke securitybeoordeling | Pentest en code review per grote release, ≥ 2× per jaar; internetfacing componenten bij elke release | Handmatig + Kalender | `kwaliteitsplan.md` §4, §6 en §8.4; `kwaliteitskalender.yml` |
+| M27 | Archivering bij afsluiting | Checklist bij fase-einde; per release een onveranderbare bewijsbundel | Handmatig + Auto | Projectorganisatie, `release.yml` |
+| M28 | Self-assessment | Halfjaarlijks via de kwaliteitskalender | Kalender | `kwaliteitsplan.md` §6, `kwaliteitskalender.yml` |
 | M29 | Interne dienstverlening vooraf | Afspraken met ISD/ISE | ICTU + Proces | Open punt 3 |
 | M30 | Risicomanagement | Risicolog | Proces | Projectorganisatie |
 | M32 | Due diligence bestaande software | Bij hergebruik van bestaande componenten (bijv. FSC, OOTS-V) | Handmatig | Per component |
@@ -47,12 +48,12 @@ raken (zoals fysieke beveiliging, netwerken, back-up en monitoring in productie)
 |---|---|---|---|---|
 | 5.8 Informatiebeveiliging in projectmanagement | 5.08.01 | Risicoanalyse en beveiligingseisen per component; beveiligingseisen in de DoR; bijwerken bij significante wijziging in de DoD | Proces | `kwaliteitsplan.md` §3, §8.2 |
 | 5.21 ICT-toeleveringsketen | 5.21.02-5.21.05 | SBOM, build-provenance en beveiligingsdocumentatie per release; end-of-life dependencies vervangen | Auto + Proces | `release.yml`, `kwaliteitsplan.md` §5, §8.6 |
-| 5.23 Clouddiensten | 5.23.01 | Register van clouddiensten en tools, inclusief AI-assistenten | Handmatig | `kwaliteitsplan.md` §8.6, §9 |
+| 5.23 Clouddiensten | 5.23.01 | Register van clouddiensten en tools, inclusief AI-assistenten | Kalender | `kwaliteitsplan.md` §6, §8.6, §9 |
 | 5.32 Intellectuele eigendomsrechten | — | EUPL-1.2; licentiecontrole van dependencies in Dependency-Track | Proces | `kwaliteitsplan.md` §5 |
 | 5.37 Gedocumenteerde bedieningsprocedures | — | Installatie- en beheerdocumentatie in de DoD | Proces | `kwaliteitsplan.md` §3, §8.8 |
-| 7.2 Competentie (27001) | — | Onboarding en jaarlijkse training veilig programmeren | Handmatig | `kwaliteitsplan.md` §8.9 |
-| 8.2 en 8.4 Toegang tot broncode | 5.17.01 (MFA) | Beschermde `main`, PR met review, CODEOWNERS, MFA, beperkte beheerrechten | Auto + Proces | `repo-aansluiten.md` stap 4, `kwaliteitsplan.md` §8.5 |
-| 8.8 Technische kwetsbaarheden | 8.08.01-8.08.05 | Trivy, Dependency-Track, `SECURITY.md`; hersteltermijn 1 week bij hoog risico; pentest per release voor internetfacing | Auto + Handmatig | `quality-ci.yml`, `kwaliteitsplan.md` §2, §8.4 |
+| 7.2 Competentie (27001) | — | Onboarding en jaarlijkse training veilig programmeren | Kalender | `kwaliteitsplan.md` §6, §8.9 |
+| 8.2 en 8.4 Toegang tot broncode | 5.17.01 (MFA) | Beschermde `main`, PR met review, CODEOWNERS, MFA, beperkte beheerrechten; wekelijkse automatische toegangscontrole en kwartaalbevestiging | Auto + Kalender | `repo-aansluiten.md` stap 4, `kwaliteitsplan.md` §6 en §8.5, `periodieke-controles.yml` |
+| 8.8 Technische kwetsbaarheden | 8.08.01-8.08.05 | Trivy, Dependency-Track, `SECURITY.md`; issue per kwetsbaarheid met deadline; hersteltermijn 1 week bij hoog risico; pentest per release voor internetfacing | Auto + Handmatig | `quality-ci.yml`, `periodieke-controles.yml`, `kwaliteitsplan.md` §2, §8.4 |
 | 8.9 Configuratiebeheer | — | Vastgepinde versies; veilige standaardconfiguratie (*security by default*) | Auto + Proces | `kwaliteitsplan.md` §5, §8.3 |
 | 8.11 Maskeren van gegevens | — | Pseudonimisering aantoonbaar getest | Proces | `kwaliteitsplan.md` §7 |
 | 8.15 Logging | 8.15.01-8.15.04 | LDV, verplichte velden per logregel, geen BSN's of secrets in logs, overzicht van logbestanden | Proces | `kwaliteitsplan.md` §7, §8.7 |
@@ -64,6 +65,6 @@ raken (zoals fysieke beveiliging, netwerken, back-up en monitoring in productie)
 | 8.29 Beveiligingstesten | 8.29.01 | SAST, dependency- en imagescan, ZAP, pentest; testrapport per release | Auto + Handmatig | `kwaliteitsplan.md` §4 |
 | 8.30 Uitbestede ontwikkeling | 8.30.01 | Zelfde eisen voor uitbestede ontwikkeling en alternatieven van bronhouders; conformancetests | Proces | `kwaliteitsplan.md` §7, §8.6 |
 | 8.31 Scheiding van omgevingen | 8.31.01-8.31.02 | Gescheiden omgevingen; niet testen in productie zonder goedkeuring | Proces | `kwaliteitsplan.md` §7, §8.8 |
-| 8.32 Wijzigingsbeheer | 8.32.01-8.32.02 | PR-proces en releases; release notes, testrapport en rollbackinstructie voor de beheerder | Auto + Proces | `kwaliteitsplan.md` §3, §8.8 |
+| 8.32 Wijzigingsbeheer | 8.32.01-8.32.02 | PR-proces en releases; release notes, testrapport en rollbackinstructie automatisch bij elke release | Auto + Proces | `kwaliteitsplan.md` §3, §8.8; `release.yml` |
 | 8.33 Testgegevens | — | Alleen synthetische testdata | Proces | `kwaliteitsplan.md` §7 |
 | 8.34 Bescherming tijdens audits | — | Pentests op productie alleen na afspraak met de beheerder | Handmatig | `kwaliteitsplan.md` §8.4 |

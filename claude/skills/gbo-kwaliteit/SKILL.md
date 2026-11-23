@@ -60,7 +60,10 @@ Normen staan in `references/normen.md`. De review-checklist staat in `references
 1. Controleer dat `main` groen is en dat er geen open kritieke kwetsbaarheden zijn.
 2. Bepaal het versienummer volgens semver op basis van de commits sinds de vorige tag
    (`git log $(git describe --tags --abbrev=0)..HEAD --oneline`).
-3. Stel een concept op van de informatie voor het vrijgaveadvies: gerealiseerde eisen en hoe getoetst,
-   openstaande bugs, afwijkingen in de kwaliteitsrapportage met risico's, overige risico's.
+3. Controleer dat `docs/rollback.md` klopt voor deze release en dat open issues met het label
+   `kwetsbaarheid` een vastgelegde risicoafweging hebben.
 4. Laat de gebruiker de tag zetten (`git tag vX.Y.Z && git push origin vX.Y.Z`); de release-workflow
-   maakt release notes, SBOM en provenance.
+   maakt release notes, SBOM, testrapport, bewijsbundel en provenance.
+5. Stel daarna een concept op van de informatie voor het vrijgaveadvies, met het testrapport van de
+   release als basis: gerealiseerde eisen en hoe getoetst, openstaande bugs, afwijkingen in de
+   kwaliteitsrapportage met risico's, overige risico's.
