@@ -42,6 +42,12 @@ jobs:
     uses: ICTU/GBO-quality/.github/workflows/pr-checks.yml@v0
     with:
       quality-ref: v0
+      # Voorwaardelijke DoD-items: raakt de PR geen van deze paden, dan hoeft het item niet te worden
+      # afgevinkt. Pas de paden aan op de component; een sleutel zonder regel geldt altijd.
+      dod-regels: |
+        koppelvlak: **/*.graphql **/*.graphqls **/openapi*.yaml **/openapi*.json **/*.proto conformance/**
+        ui: **/*.tsx **/*.jsx **/*.vue **/*.html **/*.css **/*.scss
+        risico: Dockerfile **/Dockerfile docker-compose*.yml helm/** deploy/** **/*.graphql **/openapi*.yaml
 
   # Zet aan zodra de component in de runner of op een testomgeving kan draaien.
   # dynamic:

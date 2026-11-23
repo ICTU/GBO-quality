@@ -23,7 +23,9 @@ Het kopieert:
 
 ## 2. Aanpassen aan de component
 
-- `ci.yml`: vul het testcommando en de taal in.
+- `ci.yml`: vul het testcommando en de taal in, en pas `dod-regels` aan op de mappen van de component.
+  Daarmee vervallen DoD-items over koppelvlakken, gebruikersinterface en risicoanalyse automatisch
+  als een PR die paden niet raakt.
 - `sonar-project.properties`: projectsleutel en bronmappen.
 - `.pre-commit-config.yaml`: zet de linters aan voor de gebruikte taal.
 - `CODEOWNERS`: teams of personen.

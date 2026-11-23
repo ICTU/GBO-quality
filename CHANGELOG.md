@@ -25,5 +25,10 @@ De versienummering volgt [Semantic Versioning](https://semver.org/lang/nl/).
   AI-ondersteund ontwikkelen is nu §9. Mapping van de relevante beheersmaatregelen en
   BIO2-overheidsmaatregelen in `docs/maatregelen-mapping.md`.
 - `templates/SECURITY.md` met een meldpunt voor kwetsbaarheden voor componentrepositories.
+- Slimmere DoD-check: voorwaardelijke DoD-items (`<!-- dod:sleutel -->`) vervallen automatisch als
+  de PR de paden uit de nieuwe input `dod-regels` van `pr-checks.yml` niet raakt. Het PR-template bevat
+  alleen nog items die een mens moet beoordelen; wat pipeline en branch protection borgen en de demo
+  (sprint review) zijn eruit. Kwaliteitsplan §3 beschrijft de borging per DoD-item en voegt het bijwerken
+  van de risicoanalyse toe. Achterwaarts compatibel: zonder `dod-regels` werkt de check als voorheen.
 - Normsamenvatting en review-checklist van de Claude Code-skill aangevuld (hersteltermijn,
   pentest, logging, cryptografie, MFA, pseudonimisering).

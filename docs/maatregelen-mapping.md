@@ -45,7 +45,7 @@ raken (zoals fysieke beveiliging, netwerken, back-up en monitoring in productie)
 
 | Beheersmaatregel | BIO2-overheidsmaatregel | GBO-invulling | Borging | Waar |
 |---|---|---|---|---|
-| 5.8 Informatiebeveiliging in projectmanagement | 5.08.01 | Risicoanalyse en beveiligingseisen per component; beveiligingseisen in de DoR | Proces | `kwaliteitsplan.md` §3, §8.2 |
+| 5.8 Informatiebeveiliging in projectmanagement | 5.08.01 | Risicoanalyse en beveiligingseisen per component; beveiligingseisen in de DoR; bijwerken bij significante wijziging in de DoD | Proces | `kwaliteitsplan.md` §3, §8.2 |
 | 5.21 ICT-toeleveringsketen | 5.21.02-5.21.05 | SBOM, build-provenance en beveiligingsdocumentatie per release; end-of-life dependencies vervangen | Auto + Proces | `release.yml`, `kwaliteitsplan.md` §5, §8.6 |
 | 5.23 Clouddiensten | 5.23.01 | Register van clouddiensten en tools, inclusief AI-assistenten | Handmatig | `kwaliteitsplan.md` §8.6, §9 |
 | 5.32 Intellectuele eigendomsrechten | — | EUPL-1.2; licentiecontrole van dependencies in Dependency-Track | Proces | `kwaliteitsplan.md` §5 |

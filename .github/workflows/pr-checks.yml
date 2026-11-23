@@ -21,6 +21,13 @@ on:
         description: Label waarmee de traceerbaarheidscheck bewust wordt overgeslagen.
         type: string
         default: geen-story
+      dod-regels:
+        description: >-
+          Koppelt voorwaardelijke DoD-items (<!-- dod:sleutel --> in het PR-template) aan paden, één regel per
+          sleutel, bijv. "koppelvlak: api/** **/*.graphql". Raakt de PR geen van die paden, dan is het item
+          automatisch niet van toepassing. Leeg = alle items gelden.
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -63,10 +70,31 @@ jobs:
           repository: ICTU/GBO-quality
           ref: ${{ inputs.quality-ref }}
           path: .gbo-quality
+      # De merge-commit van de PR heeft de basis als eerste ouder; het verschil daarmee zijn precies
+      # de wijzigingen van de PR. Alleen nodig als er dod-regels zijn.
+      - name: PR ophalen
+        if: inputs.dod-regels != ''
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 2
+          path: .pr
+          persist-credentials: false
       - name: Controleer Definition of Done in de PR-beschrijving
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
           IS_BOT: ${{ github.event.pull_request.user.type == 'Bot' }}
+          DOD_RULES: ${{ inputs.dod-regels }}
         run: |
           if [ "$IS_BOT" = "true" ]; then echo "PR van een bot; overgeslagen."; exit 0; fi
-          python3 .gbo-quality/scripts/check_dod.py
+          if [ -n "$DOD_RULES" ]; then
+            if ! CHANGED_FILES="$(git -C .pr diff --name-only HEAD^1 HEAD)"; then
+              echo "::error::Gewijzigde bestanden van de PR niet te bepalen."
+              exit 1
+            fi
+            export CHANGED_FILES
+          fi
+          set +e
+          python3 .gbo-quality/scripts/check_dod.py | tee dod.txt
+          status=${PIPESTATUS[0]}
+          { echo '### Definition of Done'; echo '```'; cat dod.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
