@@ -16,3 +16,8 @@ Bij verschil geldt het kwaliteitsplan.
 | Toegankelijkheid (UI) | WCAG 2.2 AA, geen axe-overtredingen |
 | Review | Minimaal 1 andere ontwikkelaar; 2 bij autorisatie, pseudonimisering, cryptografie, BSN |
 | Dependencies | Vastgepind; updates via Dependabot met 14 dagen cooldown |
+| Hersteltermijn kwetsbaarheden | Hoge kans op misbruik én hoge schade: patchrelease of mitigatieadvies binnen 1 week |
+| Pentest internetfacing componenten | Bij elke nieuwe release of major update; hoog risico zonder mitigatie blokkeert productie |
+| Logging | Actie, object, resultaat, oorsprong, actor, tijdstempel; nooit BSN's, wachtwoorden, tokens of sleutels |
+| Cryptografie | Volgens NCSC-adviezen, via bewezen bibliotheken; sleutels nooit in de code |
+| Toegang | MFA verplicht voor GitHub en ontwikkeltooling |

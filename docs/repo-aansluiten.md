@@ -17,6 +17,7 @@ Het kopieert:
 - `.github/CODEOWNERS`;
 - `.pre-commit-config.yaml`;
 - `sonar-project.properties` en `cliff.toml`;
+- `SECURITY.md`: meldpunt voor kwetsbaarheden (kwaliteitsplan §8.4);
 - `AGENTS.md`: instructies voor alle AI-codeerassistenten (Claude Code, Codex, Copilot en andere);
 - `CLAUDE.md` en `.claude/`: importeert AGENTS.md, plus skill en hooks voor Claude Code.
 
@@ -26,6 +27,8 @@ Het kopieert:
 - `sonar-project.properties`: projectsleutel en bronmappen.
 - `.pre-commit-config.yaml`: zet de linters aan voor de gebruikte taal.
 - `CODEOWNERS`: teams of personen.
+- `SECURITY.md`: ondersteunde versies en contactpersoon; zet *Private vulnerability reporting* aan
+  (Settings → Code security).
 - `AGENTS.md`: korte beschrijving van de component en hoe je lokaal test. Zet gedeelde AI-instructies
   hier, niet in `CLAUDE.md`.
 
@@ -54,6 +57,9 @@ Settings → Rules → Rulesets, of Branches → Branch protection rules:
 - Require status checks to pass: `quality / ci`, `pr / traceerbaarheid`, `pr / definition-of-done`.
 - Require linear history (squash merge).
 - Block force pushes.
+
+Controleer ook dat de GitHub-organisatie tweestapsverificatie (MFA) verplicht stelt en dat beheerrechten
+bij een kleine, benoemde groep liggen (kwaliteitsplan §8.5).
 
 ## 5. Quality-time
 

@@ -14,6 +14,11 @@ Gebaseerd op de checklist in het ICTU-template kwaliteitsplan, aangevuld voor GB
    - autorisatie wordt per verzoek afgedwongen (PEP), niet alleen in de UI of client;
    - dataminimalisatie: alleen gegevens die binnen grondslag of toestemming vallen;
    - geen BSN's of persoonsgegevens in logging, foutmeldingen of tests;
-   - cryptografie via bewezen bibliotheken, geen eigen implementaties.
+   - cryptografie via bewezen bibliotheken, geen eigen implementaties; sleutels en certificaten configureerbaar,
+     niet in de code;
+   - geen wachtwoorden, tokens of sleutels in logging; logregels bevatten actie, object, resultaat,
+     oorsprong, actor en tijdstempel;
+   - pseudonimisering is met tests aangetoond, ook tegen herleiding via combinatie van velden;
+   - veilige standaardinstellingen: onveilige opties staan uit, bij fouten wordt toegang geweigerd.
 6. **Performance:** geen onnodig zware operaties (bijv. N+1-queries in resolvers), efficiënt gebruik van resources.
 7. **Overig:** alle tests slagen; documentatie, schema's en conformancetests zijn bijgewerkt.
