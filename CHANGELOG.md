@@ -25,6 +25,20 @@ De versienummering volgt [Semantic Versioning](https://semver.org/lang/nl/).
   AI-ondersteund ontwikkelen is nu §9. Mapping van de relevante beheersmaatregelen en
   BIO2-overheidsmaatregelen in `docs/maatregelen-mapping.md`.
 - `templates/SECURITY.md` met een meldpunt voor kwetsbaarheden voor componentrepositories.
+- Testrapport en bewijsbundel bij elke release (`release.yml`): tests op de getagde versie (een falende
+  test houdt de release tegen), traceerbaarheid van logische testgevallen, kwetsbaarheden en
+  uitzonderingen, gemergde PR's met reviewers, openstaande bugs en rollbackinstructie. De bundel
+  (`bewijs-<versie>.zip`) krijgt een SHA-256-manifest en build-provenance. Nieuwe inputs: `quality-ref`,
+  `test-command`, `junit-paden`, `testgevallen-map`, `ltc-patroon`, `rollback-bestand` en `tag-patroon`.
+  **Let op:** de release-job vraagt nu ook `pull-requests: read` en `issues: read`; een aanroepende
+  workflow moet die rechten geven (zie `templates/.github/workflows/release.yml`).
+- Kwaliteitskalender en periodieke controles (`periodieke-controles.yml`, wekelijks): issues met
+  checklist en deadline voor periodieke taken uit `.github/kwaliteitskalender.yml`, het label `te-laat`
+  na de deadline, een issue per kwetsbaarheid (critical/high) dat automatisch heropent en sluit, en een
+  toegangscontrole op MFA, beheerders en bescherming van `main`.
+- Templates: `docs/rollback.md`, `docs/testgevallen/README.md`, kwaliteitskalender en `periodiek.yml`;
+  `.trivyignore` met vervaldatum (`exp:`). Kwaliteitsplan §6 beschrijft kalender, periodieke controles en
+  bewijs per release.
 - Slimmere DoD-check: voorwaardelijke DoD-items (`<!-- dod:sleutel -->`) vervallen automatisch als
   de PR de paden uit de nieuwe input `dod-regels` van `pr-checks.yml` niet raakt. Het PR-template bevat
   alleen nog items die een mens moet beoordelen; wat pipeline en branch protection borgen en de demo

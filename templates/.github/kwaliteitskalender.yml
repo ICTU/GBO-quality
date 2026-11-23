@@ -1,0 +1,100 @@
+# Kwaliteitskalender (kwaliteitsplan §6). De workflow "Periodieke controles" maakt voor elke taak aan het
+# begin van de periode een issue met checklist en deadline. Het issue sluiten, met het bewijs erbij, is
+# de administratie. Een open issue na de deadline krijgt het label "te-laat".
+#
+# Velden per taak:
+#   id           vaste sleutel (niet wijzigen; wordt gebruikt om dubbele issues te voorkomen)
+#   titel        titel van het issue
+#   frequentie   maandelijks | kwartaal | halfjaarlijks | jaarlijks
+#   start        eerste maand (JJJJ-MM); de perioden tellen vanaf hier
+#   termijn      dagen na het begin van de periode tot de deadline (standaard: einde van de periode)
+#   eigenaar     GitHub-gebruikersnaam die het issue krijgt (optioneel)
+#   labels       extra labels (optioneel)
+#   bron         waar de eis vandaan komt
+#   bewijs       wat er bij het sluiten in of bij het issue moet staan
+#   checklist    stappen
+
+beheerders:
+  # GitHub-gebruikersnamen die beheerrechten (admin) op deze repository mogen hebben (kwaliteitsplan §8.5).
+  # De toegangscontrole meldt elke andere beheerder.
+  - in-te-vullen
+
+taken:
+  - id: pentest
+    titel: Penetratietest en code review door experts
+    frequentie: halfjaarlijks
+    start: 2027-01
+    termijn: 90
+    eigenaar: ""
+    labels: [security]
+    bron: "ICTU Kwaliteitsaanpak v5.4.1, M26; BIO2 v1.3, 8.08.05; kwaliteitsplan §4 en §8.4"
+    bewijs: Pentestrapport en lijst van bevindingen met de afhandeling (issue per bevinding).
+    checklist:
+      - Scope, moment en toegang afgesproken (bij een productieomgeving met de beheerder)
+      - Test uitgevoerd door ICTU of een externe partij
+      - Rapport toegevoegd aan dit issue
+      - Elke bevinding met hoog risico heeft een issue met het label security
+      - Internetfacing componenten zijn bovendien bij elke release getest (zie vrijgave)
+
+  - id: self-assessment
+    titel: Self-assessment tegen de ICTU Kwaliteitsaanpak
+    frequentie: halfjaarlijks
+    start: 2027-03
+    eigenaar: ""
+    bron: "ICTU Kwaliteitsaanpak v5.4.1, M28; kwaliteitsplan §6"
+    bewijs: Ingevulde checklist (Quality-time) en de verbeterpunten als issues.
+    checklist:
+      - Checklist ingevuld met docs/maatregelen-mapping.md als hulpmiddel
+      - Afwijkingen besproken in het projectoverleg
+      - Verbeterpunten vastgelegd als issues
+
+  - id: toegangsrechten
+    titel: Toegangsrechten op repository en ontwikkeltooling bevestigen
+    frequentie: kwartaal
+    start: 2027-01
+    termijn: 30
+    eigenaar: ""
+    labels: [security]
+    bron: "BIO2 v1.3, 5.17.01; NEN-EN-ISO/IEC 27002:2022, 5.18, 8.2 en 8.4; kwaliteitsplan §8.5"
+    bewijs: Uitvoer van de laatste toegangscontrole en een bevestiging per tool.
+    checklist:
+      - Laatste uitvoer van de automatische toegangscontrole (GitHub) gecontroleerd
+      - Gebruikers en rechten in SonarQube, Dependency-Track en Quality-time gecontroleerd
+      - Vertrokken teamleden verwijderd; beheerrechten alleen bij de benoemde groep
+      - MFA verplicht in alle tools
+
+  - id: register-clouddiensten
+    titel: Register van clouddiensten en externe tools herzien
+    frequentie: jaarlijks
+    start: 2027-02
+    eigenaar: ""
+    bron: "NEN-EN-ISO/IEC 27002:2022, 5.23; BIO2 v1.3, 5.23.01; kwaliteitsplan §8.6 en §9"
+    bewijs: Pull request met de bijgewerkte versie van het register.
+    checklist:
+      - Nieuwe tools en AI-assistenten toegevoegd
+      - Per dienst gecontroleerd welke gegevens hij krijgt en wie verantwoordelijk is
+      - Voorwaarden van leveranciers op wijzigingen gecontroleerd
+
+  - id: training
+    titel: Training of workshop veilig programmeren
+    frequentie: jaarlijks
+    start: 2027-04
+    eigenaar: ""
+    bron: "NEN-EN-ISO/IEC 27001:2023, 7.2; NEN-EN-ISO/IEC 27002:2022, 8.25 en 8.28; ICTU Kwaliteitsaanpak v5.4.1, M23; kwaliteitsplan §8.9"
+    bewijs: Datum, onderwerp en deelnemers.
+    checklist:
+      - Training of workshop gepland en gevolgd
+      - Deelnemers vastgelegd in dit issue
+      - Nieuwe teamleden sinds de vorige training hebben de onboarding gehad
+
+  - id: risicoanalyse
+    titel: Risicoanalyses van de componenten nalopen
+    frequentie: jaarlijks
+    start: 2027-06
+    eigenaar: ""
+    labels: [security]
+    bron: "BIO2 v1.3, 5.08.01; NEN-EN-ISO/IEC 27002:2022, 5.8; kwaliteitsplan §8.2"
+    bewijs: Per component de datum van de laatste versie van de risicoanalyse; zo nodig een pull request.
+    checklist:
+      - Per component gecontroleerd of de risicoanalyse nog past bij gegevens, koppelvlakken en hosting
+      - Bijgewerkte analyses via een pull request vastgelegd

@@ -12,6 +12,11 @@ Het script kopieert alleen bestanden die nog niet bestaan; bestaande bestanden w
 Het kopieert:
 
 - `.github/workflows/ci.yml`: roept de centrale workflows aan;
+- `.github/workflows/release.yml`: release met testrapport en bewijsbundel;
+- `.github/workflows/periodiek.yml` en `.github/kwaliteitskalender.yml`: kwaliteitskalender en wekelijkse
+  controles van kwetsbaarheden en toegang;
+- `docs/rollback.md` en `docs/testgevallen/`: sjablonen voor de rollbackinstructie en de logische
+  testgevallen;
 - `.github/pull_request_template.md`: met de Definition of Done;
 - `.github/dependabot.yml`: wekelijkse updates met cooldown;
 - `.github/CODEOWNERS`;
@@ -33,6 +38,11 @@ Het kopieert:
   (Settings → Code security).
 - `AGENTS.md`: korte beschrijving van de component en hoe je lokaal test. Zet gedeelde AI-instructies
   hier, niet in `CLAUDE.md`.
+- `release.yml`: vul `test-command` in, zodat de tests op de getagde versie draaien en JUnit-XML
+  opleveren voor het testrapport. Schrijf de rollbackinstructie in `docs/rollback.md` en leg de
+  logische testgevallen vast in `docs/testgevallen/`.
+- `.github/kwaliteitskalender.yml`: vul de beheerders, de eigenaren van de taken en de startmaanden in.
+- `periodiek.yml`: vul `image-ref` in als de component een container-image publiceert.
 
 ## 3. Secrets en variabelen instellen
 
@@ -44,6 +54,12 @@ Op repository- of organisatieniveau (Settings → Secrets and variables → Acti
 | `SONAR_HOST_URL` | Variabele | SonarQube-analyse |
 | `DT_API_KEY` | Secret | SBOM-upload naar Dependency-Track |
 | `DT_URL` | Variabele | idem |
+| `GBO_AUDIT_TOKEN` | Secret (optioneel) | Toegangscontrole: MFA in de organisatie en beheerders van de repository |
+
+Het audittoken is een fine-grained token of GitHub App met alleen leesrechten: *Members* en
+*Administration* (organisatie) en *Administration* en *Metadata* (repository). Zonder dit token
+controleert de toegangscontrole alleen de bescherming van `main`. De controle op leden zonder MFA werkt
+alleen met een token van een organisatie-eigenaar.
 
 Ontbreekt een secret, dan slaat de betreffende stap over met een waarschuwing. Zo kun je beginnen voordat
 alle tooling beschikbaar is. Zet zodra de tooling er is de bijbehorende input `require-...: true`, zodat
@@ -59,6 +75,15 @@ Settings → Rules → Rulesets, of Branches → Branch protection rules:
 - Require status checks to pass: `quality / ci`, `pr / traceerbaarheid`, `pr / definition-of-done`.
 - Require linear history (squash merge).
 - Block force pushes.
+
+Gebruik bij voorkeur een ruleset: de wekelijkse toegangscontrole kan de instellingen daarvan lezen en
+meldt het als er iets ontbreekt.
+
+Zet daarnaast aan:
+
+- Settings → General → Releases: **immutable releases**, zodat een release met testrapport en
+  bewijsbundel na publicatie niet meer te wijzigen is (kwaliteitsplan §6 en §8.1);
+- Settings → General → Pull Requests: **automatically delete head branches**.
 
 Controleer ook dat de GitHub-organisatie tweestapsverificatie (MFA) verplicht stelt en dat beheerrechten
 bij een kleine, benoemde groep liggen (kwaliteitsplan §8.5).

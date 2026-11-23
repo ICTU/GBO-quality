@@ -1,4 +1,6 @@
-# Geaccepteerde kwetsbaarheden. Per regel: CVE-ID, met daarboven reden, issue en vervaldatum.
+# Geaccepteerde kwetsbaarheden. Per regel: CVE-ID met vervaldatum (exp:JJJJ-MM-DD), met daarboven
+# de reden en het issue. Na de vervaldatum telt de kwetsbaarheid weer mee in de scans, zodat de
+# afweging opnieuw gemaakt wordt. Een regel zonder vervaldatum is een bevinding in het testrapport.
 # Voorbeeld:
-# # Niet exploiteerbaar: functie wordt niet gebruikt. Issue GBO-321. Vervalt 2027-03-01.
-# CVE-2026-12345
+# # Niet exploiteerbaar: functie wordt niet gebruikt. Issue GBO-321.
+# CVE-2026-12345 exp:2027-03-01

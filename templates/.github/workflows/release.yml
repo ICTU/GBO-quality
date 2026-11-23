@@ -1,4 +1,6 @@
 # Release bij een versietag. Maak een release met: git tag v1.2.3 && git push origin v1.2.3
+# De release krijgt release notes, SBOM, testrapport en een bewijsbundel (kwaliteitsplan §4, §8.1, §8.8).
+# Zet in de repository "immutable releases" aan (Settings → General → Releases).
 name: Release
 
 on:
@@ -15,8 +17,15 @@ jobs:
       contents: write
       id-token: write
       attestations: write
+      pull-requests: read
+      issues: read
     with:
+      quality-ref: v0
       build-command: ""      # bijv. "make dist"
       artifact-paths: ""     # bijv. "dist/*"
+      test-command: ""       # bijv. "go test ./... -v 2>&1 | go-junit-report > junit.xml"
+      # junit-paden: "**/junit*.xml"
+      # testgevallen-map: docs/testgevallen
+      # rollback-bestand: docs/rollback.md
       dependency-track-url: ${{ vars.DT_URL }}
     secrets: inherit
